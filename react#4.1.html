@@ -14,35 +14,44 @@
 <script src="https://unpkg.com/react@17.0.2/umd/react.development.js"></script>
 <script src="https://unpkg.com/react-dom@17.0.2/umd/react-dom.development.js"></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-<script src="https://unpkg.com/prop-types@15.7.2/prop-types.js"></script>
 <script type="text/babel">
-  // 함수의 매개변수에서 정의되지 않은 매개변수에 대해 기본값을 설정할 수 있다.
-  function Btn({text, fontSize = 5}){
+
+  // Btn이 지정해준 banana를 매개변수로 받을 수 있다.
+  // 유일한 매개변수이며 다른 인자는 없음
+  // function Btn({banana}){  // 객체안에 있는 값을 받아오고 싶으면 중괄호로 객체형태로 받아와야 한다.
+  // function Btn(props){
+
+  function Btn({text, changeValue}){
+    console.log(text, "was render")
     return <button style={{
       backgroundColor: 'tomato',
       color: 'white',
       padding: '10px 20px',
       border: 0,
       borderRadius: 10,
-      // fontSize: fontSize,
-      // 이름이 같기 때문에
-      fontSize // 이렇게 바로 적용 가능
-    }}
+      fontSize: 16,
+    }} onClick={changeValue}
     >{text}</button>;
     // }}>{banana}</button>; // 이렇게 오브젝트를 직접 매개변수로 받아서 사용 할 수 있다.
   }
 
-  // propTypes를 사용하면 타입을 벗어날 경우 경고를 볼 수 있음.
-  Btn.propTypes = {
-    text: PropTypes.string.isRequired, // 이 프로퍼티가 무조건 존재해야할 때 // 존재하지 않을 때 경고문구를 보고싶다면 isRequired 적용
-    fontSize: PropTypes.number,
-  }
+  // 변경되지 않을 경우 render하지 않음 React.memo
+  const MemorizedBtn = React.memo(Btn)
   const App = () => {
+    const [value, setValue] = React.useState("Save Changes")
+    const [value2, setValue2] = React.useState('Continue');
+    const changeValue = () => {
+      setValue("Revert Changes")
+    }
+    const changeValue2 = () => {
+      setValue2("testBtn2")
+    }
     return (
-      <div>
-        <Btn text='Save Changes' fontSize={18}/>
-        <Btn text='asdasd'/>
-      </div>);
+            <div>
+              <MemorizedBtn text={value} changeValue={changeValue}/>
+              <MemorizedBtn text={value2} changeValue={changeValue2}/>
+              <MemorizedBtn text="Continue" />
+            </div>);
   }
   // text는 자유롭게 지정가능, potato or banana 아무거나
   // 컴포넌트 안에 onClick같은 이벤트리스터 이름을 넣어도 이벤트리스너가 아닌
