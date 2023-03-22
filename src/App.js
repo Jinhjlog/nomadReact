@@ -1,45 +1,47 @@
-import {useState} from "react";
+import {useEffect, useState} from "react";
 
 function App() {
+  const [loading, setLoading] = useState(true);
+  const [coins, setCoins] = useState([])
+  const [myCoin, setMyCoin] = useState();
+  const [dollar, setDollar] = useState(0)
 
-  const [toDo, setToDo] = useState("");
-  const [toDos, setToDos] = useState([]);
+  useEffect(() => {
+    fetch('https://api.coinpaprika.com/v1/tickers')
+      .then((response) => {return response.json()})
+      .then((json) => {
+        setMyCoin(current => json[0])
+        setCoins(json)
+        setLoading(false);
+      })
+  }, [])
 
-  const onChange= (event) => setToDo(event.target.value);
-  const onSubmit = (event) => {
-    event.preventDefault();
-    if(toDo === '') {
-      return;
-    }
-    // 함수로 값을 수정하는 방식
-    setToDos((currentArray) => {
-      const newArray = [toDo, ...currentArray]
-      return newArray;
+  const changeMyCoin = (event) => {
+    console.log(event.target.value)
+  }
+
+  const onChangeDollar = (event) => {
+    // console.log(event.target.value)
+    setDollar((dollar) => {
+      return event.target.value;
     })
-    // 값을 직접 수정하는 방식
-    setToDo("");
   }
 
   return (
     <div>
-      <h1>My TO Dos ({toDos.length})</h1>
-      <form onSubmit={onSubmit}>
-        <input
-          onChange={onChange}
-          value={toDo}
-          type='text'
-          placeholder='Write your to do...'
-        />
-        <button>Add To Do</button>
-      </form>
+      <h1>The Coins! {loading ? "" : `(${coins.length})`}</h1>
+      {
+        loading ?
+          <strong>Loading...</strong> :
+          <select onChange={changeMyCoin}>
+            {coins.map((coin) => {
+              return (<option value={coin.quotes.USD.price} key={coin.id}>{coin.name} ({coin.symbol}) : ${coin.quotes.USD.price}</option>)
+            })}
+          </select>
+      }
       <hr/>
-      <ul>
-        {
-          toDos.map((item, index) => {
-            return (<li key={index}>{item}</li>)
-          })
-        }
-      </ul>
+      <input type='number' onChange={onChangeDollar} placeholder='$$$'/>
+      <button>update</button>
     </div>
   );
 }
@@ -67,7 +69,7 @@ submit은 기본적으로 페이지 이동이나 새로고침을 하는데 그�
 
 li에는 key라는게 필요함
 react가 기본적으로 list에 있는 모든 item들을 인식하기 때문에 prop 으로 key를 넣어주어야 함
-
+# 7.2
 
 
 
